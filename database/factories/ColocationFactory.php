@@ -17,7 +17,7 @@ class ColocationFactory extends Factory
     public function definition(): array
     {
         return [
-            //
+            'statut' => fake()->randomElement(['active', 'anullé']),
         ];
     }
 }

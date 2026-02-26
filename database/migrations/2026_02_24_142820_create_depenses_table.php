@@ -14,8 +14,15 @@ return new class extends Migration
         Schema::create('depenses', function (Blueprint $table) {
             $table->id();
             $table->timestamps();
+            $table->string('titre');
+            $table->integer('montant');
+            $table->foreignId('createur_id')->constrained('users');
+            $table->foreignId('payeur_id')->constrained('users');
+            $table->foreignId('colocation_id')->constrained();
+            
         });
     }
+
 
     /**
      * Reverse the migrations.

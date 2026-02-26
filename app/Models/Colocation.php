@@ -9,4 +9,7 @@ class Colocation extends Model
 {
     /** @use HasFactory<\Database\Factories\ColocationFactory> */
     use HasFactory;
+    protected $fillable = [
+        'statut',
+    ];
 }

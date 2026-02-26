@@ -14,6 +14,9 @@ return new class extends Migration
         Schema::create('adhesions', function (Blueprint $table) {
             $table->id();
             $table->timestamps();
+            $table->enum('role',['member','owner']);
+            $table->foreignId('user_id')->constrained();
+            $table->foreignId('colocation_id')->constrained();
         });
     }
 

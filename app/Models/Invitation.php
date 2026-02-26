@@ -9,4 +9,10 @@ class Invitation extends Model
 {
     /** @use HasFactory<\Database\Factories\InvitationFactory> */
     use HasFactory;
+    protected $fillable = [
+        'email',
+        'token',
+        'statut',
+        'adhesion_id',
+    ];
 }

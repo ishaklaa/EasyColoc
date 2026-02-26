@@ -14,6 +14,10 @@ return new class extends Migration
         Schema::create('paiements', function (Blueprint $table) {
             $table->id();
             $table->timestamps();
+            $table->string('montant');
+            $table->foreignId('user_id')->constrained();
+            $table->foreignId('depense_id')->constrained();
+            $table->boolean('paye');
         });
     }
 

@@ -9,4 +9,8 @@ class Categorie extends Model
 {
     /** @use HasFactory<\Database\Factories\CategorieFactory> */
     use HasFactory;
+    protected $fillable = [
+        'titre',
+        'colocation_id',
+    ];
 }

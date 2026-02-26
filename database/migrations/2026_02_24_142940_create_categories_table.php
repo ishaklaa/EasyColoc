@@ -14,6 +14,9 @@ return new class extends Migration
         Schema::create('categories', function (Blueprint $table) {
             $table->id();
             $table->timestamps();
+            $table->string('titre');
+            $table->foreignId('colocation_id')->constrained();
+            $table->foreignId('depense_id')->constrained();
         });
     }
 

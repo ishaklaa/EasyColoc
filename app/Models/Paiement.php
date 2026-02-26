@@ -9,4 +9,9 @@ class Paiement extends Model
 {
     /** @use HasFactory<\Database\Factories\PaiementFactory> */
     use HasFactory;
+    protected $fillable = [
+        'depense_id',
+        'user_id',
+        'montant',
+    ];
 }

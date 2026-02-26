@@ -17,7 +17,9 @@ class CategorieFactory extends Factory
     public function definition(): array
     {
         return [
-            //
+            'titre'=>fake()->words(3, true),
+            'colocation_id' =>fake()->numberBetween(1, 20),
+            'depense_id'=> fake()->numberBetween(1, 20),
         ];
     }
 }
