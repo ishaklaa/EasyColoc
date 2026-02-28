@@ -17,6 +17,7 @@ return new class extends Migration
             $table->enum('role',['member','owner']);
             $table->foreignId('user_id')->constrained();
             $table->foreignId('colocation_id')->constrained();
+            $table->date('laisse_a')->nullable();
         });
     }
 

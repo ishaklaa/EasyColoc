@@ -11,5 +11,27 @@ class Colocation extends Model
     use HasFactory;
     protected $fillable = [
         'statut',
+        'titre',
     ];
+    public function users(){
+        return $this->belongsToMany(User::class, 'adhesions')->withPivot('role','laisse_a');
+    }
+    
+    public function owner()
+{
+    return $this->users()->wherePivot('role', 'owner');
+}
+  public function members()
+{
+    return $this->users()->wherePivot('role', 'member');
+}
+    public function categories(){
+        return $this->hasMany(Categorie::class);
+    }
+    public function depenses(){
+        return $this->hasMany(Depense::class);
+    }
+    public function invitations(){
+        return $this->hasMany(Invitation::class);
+    }
 }

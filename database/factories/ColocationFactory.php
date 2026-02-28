@@ -18,6 +18,7 @@ class ColocationFactory extends Factory
     {
         return [
             'statut' => fake()->randomElement(['active', 'anullé']),
+            'titre' => fake()->words(3, true),
         ];
     }
 }

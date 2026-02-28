@@ -26,7 +26,16 @@ class User extends Authenticatable
         'reputaion',
         'statut',
     ];
-
+    public function colocations()
+    {
+        return $this->belongsToMany(Colocation::class, 'adhesions')->withPivot('role','laisse_a');
+    }
+    public function paiements(){
+        return $this->hasMany(Paiement::class);
+    }
+    public function depenses(){
+        return $this->hasMany(Depense::class);
+    }
     /**
      * The attributes that should be hidden for serialization.
      *

@@ -18,10 +18,10 @@ class InvitationFactory extends Factory
     public function definition(): array
     {
         return [
-            'email' => fake()->unique()->safeEmail(),
+            // 'email' => fake()->unique()->safeEmail(),
             'token' => fake()->sentence(),
             'statut' => fake()->randomElement(['en attente', 'accepter', 'resfuser']),
-            'adhesion_id' => fake()->numberBetween(1, 20),
+            'colocation_id' => fake()->numberBetween(1, 20),
         ];
     }
 }

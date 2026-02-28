@@ -13,4 +13,10 @@ class Categorie extends Model
         'titre',
         'colocation_id',
     ];
+    public function depense(){
+        return $this->belongsTo(Categorie::class);
+    }
+    public function colocation(){
+        return $this->belongsTo(Colocation::class);
+    }
 }

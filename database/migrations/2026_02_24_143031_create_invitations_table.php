@@ -13,10 +13,10 @@ return new class extends Migration {
         Schema::create('invitations', function (Blueprint $table) {
             $table->id();
             $table->timestamps();
-            $table->string('email');
+            // $table->string('email');
             $table->string('token');
             $table->enum('statut', ['en attente', 'accepter', 'resfuser']);
-            $table->foreignId('adhesion_id')->constrained();
+            $table->foreignId('colocation_id')->constrained();
         });
     }
 

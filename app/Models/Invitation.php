@@ -13,6 +13,9 @@ class Invitation extends Model
         'email',
         'token',
         'statut',
-        'adhesion_id',
+        'colocation_id',
     ];
+    public function adhesion(){
+        return $this->belongsTo(Colocation::class);
+    }
 }

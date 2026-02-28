@@ -20,6 +20,7 @@ class AdhesionFactory extends Factory
             'role' => fake()->randomElement(['owner', 'membre']),
             'colocation_id' =>fake()->numberBetween(1, 20),
             'user_id' => fake()->numberBetween(1, 20),
+            'laisse_a'=> fake()->date(),
         ];
     }
 }

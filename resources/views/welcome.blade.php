@@ -5,7 +5,7 @@
 
     <div class="min-h-screen bg-gradient-to-br from-indigo-600 to-purple-700 flex flex-col">
 
-        <!-- Hero Section -->
+       
         <div class="flex flex-1 items-center justify-center px-6">
             <div class="text-center text-white max-w-3xl">
 
@@ -45,7 +45,7 @@
             </div>
         </div>
 
-        <!-- Features Section -->
+        
         <div class="bg-white py-16">
             <div class="max-w-6xl mx-auto px-6 grid md:grid-cols-3 gap-8 text-center">
 
@@ -79,7 +79,7 @@
             </div>
         </div>
 
-        <!-- Footer -->
+        
         <footer class="text-center py-6 text-white bg-indigo-700">
             © {{ date('Y') }} EasyColoc. All rights reserved.
         </footer>

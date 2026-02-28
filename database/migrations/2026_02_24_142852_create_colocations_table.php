@@ -15,6 +15,8 @@ return new class extends Migration
             $table->id();
             $table->timestamps();
             $table->enum('statut',['active','annulé']);
+            $table->string('titre');
+           
         });
     }
 

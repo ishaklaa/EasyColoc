@@ -10,9 +10,6 @@ class Adhesion extends Model
 {
     /** @use HasFactory<\Database\Factories\AdhesionFactory> */
     use HasFactory;
-    protected $fillable = ['role', 'user_id', 'colocation_id',];
-    public function user(): BelongsTo 
-    {
-
-    }
+    protected $fillable = ['role', 'user_id', 'colocation_id','laisse_a',];
+    
 }
