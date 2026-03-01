@@ -34,7 +34,7 @@ class AuthenticatedSessionController extends Controller
             return redirect()->route('login.dashboard');
         }
         else if ($user->role == 'user'){
-            return redirect()->route('login.user.dashboard');
+            return redirect()->route('admin.colocations.index');
 
     }
     }

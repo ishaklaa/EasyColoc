@@ -10,14 +10,24 @@ use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
+use phpDocumentor\Reflection\Types\Null_;
 
 class ColocationController extends Controller
 {
     public function index()
     {
         // $colocations = Colocation::with('owner')->where('statut', 'active')->get();
-        $colocations = Auth::user()->colocations()->with('owner')->get();
-        return view('CollocationDashboard', compact('colocations'));
+        // $colocations = Auth::user()->colocations()->with('owner')->get();
+        $user = Auth::user();
+        $currentColocation = Colocation::where('statut', 'active')
+            ->whereHas('users', function ($q) use ($user) {
+                $q->where('users.id', $user->id);
+            })->first();
+        $pastColocations = Colocation::whereHas('users', function ($q) use ($user) {
+            $q->where('users.id', $user->id)
+                ->whereNotNull('adhesions.laisse_a');
+        })->get();
+        return view('CollocationDashboard', compact('currentColocation', 'pastColocations'));
     }
     public function create()
     {
@@ -30,14 +40,24 @@ class ColocationController extends Controller
     public function store(Request $request)
     {
         $user = Auth::user();
-        $colocation = Colocation::create([
-            'titre' => $request->titre,
-            'statut' => 'active',
-        ]);
-        $user->colocations()->attach($colocation->id, [
-            'role' => 'owner',
-        ]);
-        return redirect()->route('admin.colocations.index');
+        $isUserIn = Colocation::where('statut', 'active')
+            ->whereHas('users', function ($q) use ($user) {
+                $q->where('users.id', $user->id);
+            })
+            ->exists();
+        if ($isUserIn) {
+            return back()->with('error', 'vous étes déja dans une colocation active');
+        } else {
+            $colocation = Colocation::create([
+                'titre' => $request->titre,
+                'statut' => 'active',
+            ]);
+            $user->colocations()->attach($colocation->id, [
+                'role' => 'owner',
+            ]);
+            return redirect()->route('admin.colocations.index');
+        }
+
     }
     public function show($id)
     {
@@ -84,7 +104,7 @@ class ColocationController extends Controller
         if ($colocation) {
             $isUserIn = Colocation::where('statut', 'active')
                 ->whereHas('users', function ($q) use ($user) {
-                    $q->where('users.id', $user->id); 
+                    $q->where('users.id', $user->id);
                 })
                 ->exists();
             if ($isUserIn) {

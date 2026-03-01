@@ -28,7 +28,7 @@ class User extends Authenticatable
     ];
     public function colocations()
     {
-        return $this->belongsToMany(Colocation::class, 'adhesions')->withPivot('role','laisse_a');
+        return $this->belongsToMany(Colocation::class, 'adhesions')->withPivot('role','laisse_a')->withTimestamps();
     }
     public function paiements(){
         return $this->hasMany(Paiement::class);

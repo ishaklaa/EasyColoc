@@ -1,62 +1,90 @@
 @extends('layouts.app')
 
 @section('content')
-    <div class="min-h-screen py-10">
-        <div class="max-w-7xl mx-auto px-6">
+    <div class="min-h-screen bg-gray-100 py-10">
+        <div class="max-w-6xl mx-auto px-6">
 
+            <!-- Header -->
             <div class="flex justify-between items-center mb-10">
                 <div>
-                    <h1 class="text-4xl font-bold text-gray-800">
-                        Colocations Dashboard
+                    <h1 class="text-3xl font-bold text-gray-800">
+                        User Dashboard 👋
                     </h1>
                     <p class="text-gray-500 mt-2">
-                        List of all colocations
+                        Welcome back, {{ auth()->user()->name }}
                     </p>
                 </div>
 
+                <form method="POST" action="{{ route('logout') }}">
+                    @csrf
+                    <button type="submit"
+                        class="bg-red-500 hover:bg-red-600 text-white px-6 py-2 rounded-lg shadow-md transition">
+                        Logout
+                    </button>
+                </form>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="flex gap-4 mb-10">
                 <a href="{{ route('admin.colocations.create') }}"
                     class="bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded-lg shadow-md transition">
                     Créer une colocation
                 </a>
+
                 <a href="{{ route('colocations.joinForm') }}"
                     class="bg-indigo-500 hover:bg-indigo-600 text-white px-6 py-2 rounded-lg shadow-md transition">
                     Rejoindre une colocation
                 </a>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                @forelse($colocations as $colocation)
-                    <div
-                        class="bg-white rounded-2xl shadow-md p-6 hover:shadow-xl transition min-h-[160px] flex flex-col justify-between">
+            <!-- Current Colocation -->
+            <div class="mb-12">
+                <h2 class="text-2xl font-semibold text-gray-800 mb-6">
+                    Colocation actuelle
+                </h2>
 
+                @if($currentColocation ?? null)
+                    <div class="bg-white p-6 rounded-2xl shadow-md flex justify-between items-center">
                         <div>
-                            <h2 class="text-xl font-semibold text-gray-800">
-                                {{ $colocation->titre }}
-                            </h2>
-
-                            <p class="text-sm text-gray-500 mt-3">
-                                Owner:
-                                <span class="font-medium text-gray-700">
-                                    {{ $colocation->owner->first()->name ?? 'N/A' }}
-                                </span>
+                            <h3 class="text-xl font-bold text-gray-800">
+                                {{ $currentColocation->titre }}
+                            </h3>
+                            <p class="text-gray-500 mt-2">
+                                Status: {{ $currentColocation->statut }}
                             </p>
                         </div>
 
-                        {{-- Entrer button only if active --}}
-                        @if($colocation->statut === 'active')
-                            <div class="mt-4">
-                                <a href="{{ route('colocations.show', $colocation->id) }}"
-                                    class="inline-block bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg shadow transition text-center">
-                                    Entrer
-                                </a>
-                            </div>
-                        @endif
+                        <a href="{{ route('colocations.show', $currentColocation->id) }}"
+                            class="bg-blue-500 hover:bg-blue-600 text-white px-5 py-2 rounded-lg shadow transition">
+                            Entrer
+                        </a>
+                    </div>
+                @else
+                    <p class="text-gray-500">
+                        Vous n'êtes dans aucune colocation active.
+                    </p>
+                @endif
+            </div>
 
+            <!-- Past Colocations -->
+            <div>
+                <h2 class="text-2xl font-semibold text-gray-800 mb-6">
+                    Anciennes colocations
+                </h2>
+
+                @forelse($pastColocations ?? collect() as $colocation)
+                    <div class="bg-white p-6 rounded-2xl shadow-md mb-4">
+                        <h3 class="text-lg font-semibold text-gray-800">
+                            {{ $colocation->titre }}
+                        </h3>
+                        <p class="text-gray-500 mt-1">
+                            Status: {{ $colocation->statut }}
+                        </p>
                     </div>
                 @empty
-                    <div class="col-span-3 text-center text-gray-500">
-                        No colocations found.
-                    </div>
+                    <p class="text-gray-500 italic text-center mt-4">
+                        Aucune ancienne colocation.
+                    </p>
                 @endforelse
             </div>
 
