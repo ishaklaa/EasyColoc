@@ -31,6 +31,9 @@ Route::middleware('auth')->group(function () {
     Route::get('/colocations.show/{id}', [ColocationController::class,'show'])->name('colocations.show');
     Route::post('/owner.colocation.token/{id}',[ColocationController::class,'tokenGenerate'])->name('owner.colocation.token');
     Route::post('/store.categorie/{id}',[CategorieController::class,'store'])->name('store.categorie');
+
+    Route::get('/colocations.joinForm',[ColocationController::class,'join'])->name('colocations.joinForm');
+    Route::post('/colocations.joinByToken',[ColocationController::class,'tokenCheck'])->name('colocations.joinByToken');
 });
 
 require __DIR__.'/auth.php';

@@ -18,6 +18,10 @@
                     class="bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded-lg shadow-md transition">
                     Créer une colocation
                 </a>
+                <a href="{{ route('colocations.joinForm') }}"
+                    class="bg-indigo-500 hover:bg-indigo-600 text-white px-6 py-2 rounded-lg shadow-md transition">
+                    Rejoindre une colocation
+                </a>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
