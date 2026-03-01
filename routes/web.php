@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
+use App\Http\Controllers\CategorieController;
 use App\Http\Controllers\ColocationController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RoleCheckController;
@@ -27,7 +28,9 @@ Route::middleware('auth')->group(function () {
     Route::get('/admin.colocations.index', [ColocationController::class,'index'])->name('admin.colocations.index');
     Route::get('/admin.colocations.create', [ColocationController::class,'create'])->name('admin.colocations.create');
     Route::post('/admin.colocations.store', [ColocationController::class,'store'])->name('admin.colocations.store');
-    Route::get('/admin.colocations.show', [ColocationController::class,'show'])->name('admin.colocations.show');
+    Route::get('/colocations.show/{id}', [ColocationController::class,'show'])->name('colocations.show');
+    Route::post('/owner.colocation.token/{id}',[ColocationController::class,'tokenGenerate'])->name('owner.colocation.token');
+    Route::post('/store.categorie/{id}',[CategorieController::class,'store'])->name('store.categorie');
 });
 
 require __DIR__.'/auth.php';

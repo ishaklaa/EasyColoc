@@ -16,7 +16,7 @@ return new class extends Migration
             $table->timestamps();
             $table->string('titre');
             $table->foreignId('colocation_id')->constrained();
-            $table->foreignId('depense_id')->constrained();
+            // $table->foreignId('depense_id')->constrained();
         });
     }
 

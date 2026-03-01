@@ -15,8 +15,8 @@ class ColocationController extends Controller
 {
     public function index()
     {
-        $colocations = Colocation::with('owner')->where('statut', 'active')->get();
-        // $adhesions = Adhesion::all();
+        // $colocations = Colocation::with('owner')->where('statut', 'active')->get();
+        $colocations = Auth::user()->colocations()->with('owner')->get();
         return view('CollocationDashboard', compact('colocations'));
     }
     public function create()
@@ -38,25 +38,35 @@ class ColocationController extends Controller
     public function show($id)
     {
         $colocation = Colocation::find($id);
-        $owner_id = $colocation->owner()->id;
+        $owner_id = $colocation->owner()->first()->id;
+        // dd($owner_id)
         $user = Auth::user();
-        if (!$user->colocations()->where('statut', 'active')->exists()) {
-            if ($user->id == $owner_id) {
-                $members = $colocation->members()->get();
-                $categories = $colocation->categories()->get();
-                $invitation_token = Invitation::where('colocation_id', $id)->latest()->first();
-                return view('OwnerColocation', compact('members', 'categories', 'colocation','invitation_token'));
-            }
+
+        if ($user->id == $owner_id) {
+            $members = $colocation->users()->get();
+            $categories = $colocation->categories()->get();
+            $invitation_token = Invitation::where('colocation_id', $id)->latest()->first()->token;
+            // dd($invitation_token);
+
+            return view('OwnerColocation', compact('members', 'categories', 'colocation', 'invitation_token'));
         }
+
     }
     public function tokenGenerate($id)
     {
         $colocation = Colocation::find($id);
-        $invitation = Invitation::create([
+        $invitation_token = Str::random(8);
+        // dd($invitation_token);
+        // $colocation = Colocation::find($id);
+        Invitation::create([
             'colocation_id' => $id,
             'statut' => 'en attente',
-            'token' => Str::random(8),
+            'token' => $invitation_token,
         ]);
+
+        return redirect()->route('colocations.show', $colocation);
+
+
 
     }
 }

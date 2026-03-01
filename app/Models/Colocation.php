@@ -14,7 +14,7 @@ class Colocation extends Model
         'titre',
     ];
     public function users(){
-        return $this->belongsToMany(User::class, 'adhesions')->withPivot('role','laisse_a');
+        return $this->belongsToMany(User::class, 'adhesions' )->withPivot('role','laisse_a');
     }
     
     public function owner()

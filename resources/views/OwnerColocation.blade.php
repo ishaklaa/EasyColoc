@@ -49,7 +49,7 @@
                 </div>
 
                
-                <form method="POST" action="#">
+                <form method="POST" action="{{ route('store.categorie', $colocation->id) }}">
                     @csrf
                     <div class="flex gap-4">
                         <input type="text" name="categorie" placeholder="Nom de la catégorie"
