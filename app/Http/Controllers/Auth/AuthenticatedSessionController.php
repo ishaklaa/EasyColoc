@@ -34,6 +34,9 @@ class AuthenticatedSessionController extends Controller
             return redirect()->route('login.dashboard');
         }
         else if ($user->role == 'user'){
+            // if($user->statut == 'bloque'){
+
+            // }
             return redirect()->route('admin.colocations.index');
 
     }

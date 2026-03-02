@@ -5,13 +5,50 @@
         <div class="max-w-6xl mx-auto px-6">
 
             {{-- Titre de la colocation --}}
-            <div class="mb-10">
-                <h1 class="text-4xl font-bold text-gray-800">
-                    {{ $colocation->titre }}
-                </h1>
-                <p class="text-gray-500 mt-2">
-                    Gestion de la colocation
-                </p>
+            <div class="mb-10 flex justify-between items-center">
+                <div>
+                    <h1 class="text-4xl font-bold text-gray-800">
+                        {{ $colocation->titre }}
+                    </h1>
+                    <p class="text-gray-500 mt-2">
+                        Gestion de la colocation
+                    </p>
+                </div>
+
+                <a href="{{ route('admin.colocations.index') }}"
+                    class="bg-gray-800 hover:bg-gray-900 text-white px-6 py-3 rounded-lg shadow transition">
+                    ← Dashboard
+                </a>
+            </div>
+            {{-- Section Retirer un membre --}}
+            <div class="bg-white rounded-2xl shadow-md p-6 mb-10">
+                <h2 class="text-2xl font-semibold text-gray-800 mb-6">Retirer un membre</h2>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    @foreach($members as $user)
+                        <div class="bg-gray-50 rounded-xl p-4 border flex justify-between items-center">
+                            <p class="font-semibold text-gray-800">
+                                {{ $user->name }}
+
+                                @if($user->id == auth()->user()->id)
+                                    <span class="text-xs text-indigo-600 font-semibold ml-2">(Owner)</span>
+                                @endif
+                            </p>
+
+                            {{-- Bouton pour retirer (pas pour owner) --}}
+                            @if($user->id !== auth()->user()->id)
+                                <form method="POST" action="{{ route('colocation.removeMember', [$colocation->id, $user->id]) }}">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" onclick="return confirm('Êtes-vous sûr de vouloir retirer ce membre ?')"
+                                        class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-lg shadow transition text-sm">
+                                        Retirer
+                                    </button>
+                                </form>
+                            @endif
+                        </div>
+                    @endforeach
+                </div>
             </div>
 
             {{-- Membres --}}
@@ -81,7 +118,7 @@
                     Ajouter une dépense
                 </a>
 
-              
+
                 {{-- Dépenses non payées --}}
                 <div class="bg-white rounded-2xl shadow-md p-6 mb-10">
                     <h2 class="text-2xl font-semibold text-red-600 mb-6">
@@ -100,7 +137,7 @@
                                     </p>
                                 </div>
 
-                                <form method="POST" action="{{ route('depense.payer', $depense->id,) }}">
+                                <form method="POST" action="{{ route('depense.payer', $depense->id, ) }}">
                                     @csrf
                                     <button type="submit"
                                         class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg shadow transition">
@@ -156,7 +193,7 @@
                             <p class="text-gray-500">Aucune dette pour le moment.</p>
                         @endforelse
                     </div>
-            </div>
+                </div>
 
             </div>
         </div>

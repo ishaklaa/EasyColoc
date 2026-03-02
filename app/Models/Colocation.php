@@ -13,25 +13,34 @@ class Colocation extends Model
         'statut',
         'titre',
     ];
-    public function users(){
-        return $this->belongsToMany(User::class, 'adhesions' )->withPivot('role','laisse_a')->withTimestamps();
+    public function users()
+    {
+        return $this->belongsToMany(User::class, 'adhesions')->withPivot('role', 'laisse_a')->withTimestamps();
     }
-    
+
     public function owner()
-{
-    return $this->users()->wherePivot('role', 'owner');
-}
-  public function members()
-{
-    return $this->users()->wherePivot('role', 'member');
-}
-    public function categories(){
+    {
+        return $this->users()->wherePivot('role', 'owner');
+    }
+    public function members()
+    {
+        return $this->users()->wherePivot('role', 'member');
+    }
+    public function allUsers()
+    {
+        return $this->users();
+
+    }
+    public function categories()
+    {
         return $this->hasMany(Categorie::class);
     }
-    public function depenses(){
+    public function depenses()
+    {
         return $this->hasMany(Depense::class);
     }
-    public function invitations(){
+    public function invitations()
+    {
         return $this->hasMany(Invitation::class);
     }
 }

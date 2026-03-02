@@ -7,11 +7,13 @@ use App\Models\Colocation;
 
 use App\Models\Depense;
 use App\Models\Invitation;
+use App\Models\Paiement;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use phpDocumentor\Reflection\Types\Null_;
+use PhpParser\Node\Scalar\MagicConst\Function_;
 
 class ColocationController extends Controller
 {
@@ -66,7 +68,10 @@ class ColocationController extends Controller
         $owner_id = $colocation->owner()->first()->id;
         $user = Auth::user();
         if ($user->id == $owner_id) {
-            $members = $colocation->users()->get();
+            $members = User::whereHas('colocations', function ($q) use ($colocation) {
+                $q->where('colocations.id', $colocation->id)
+                    ->whereNull('adhesions.laisse_a');
+            })->get();
             $categories = $colocation->categories()->get();
             $invitation_token = Str::random(8);
             Invitation::create([
@@ -80,15 +85,23 @@ class ColocationController extends Controller
                     $q->where('paye', false);
                 })
                 ->get();
-            $usersCount = $colocation->users()->count();
+            $usersCount = User::whereHas('colocations', function ($q) {
+                $q->whereNull('adhesions.laisse_a');
+            })->count();
+
+
 
             $dettes = [];
+            $part = 0;
             foreach ($depenses as $depense) {
-                $part = $depense->montant / $usersCount;
+                $part += $depense->montant / $usersCount;
                 $payeur = $colocation->users()->where('users.id', $depense->payeur_id)->first();
-                $payeur->solde = $part;
+                $payeur->solde = $depense->montant - $part;
                 $payeur->save();
-                foreach ($colocation->users()->where('users.id', '!=', $depense->payeur_id)->get() as $debiteur) {
+                $debiteurs = User::where('users.id', '!=', $depense->payeur_id)->whereHas('colocations', function ($q) {
+                    $q->whereNull('adhesions.laisse_a');
+                })->get();
+                foreach ($debiteurs as $debiteur) {
                     $debiteur->solde = -$part;
                     $debiteur->save();
                     $dettes[] = (object) [
@@ -111,26 +124,33 @@ class ColocationController extends Controller
                 ->get();
             return view('OwnerColocation', compact('members', 'categories', 'colocation', 'invitation_token', 'dettes', 'depensesNonPayees', 'depensesPayees'));
         } else {
-          
-
-            $colocation = Colocation::find($id);
-            $members = $colocation->users()->get();
+            $members = User::whereHas('colocations', function ($q) use ($colocation) {
+                $q->where('colocations.id', $colocation->id)
+                    ->whereNull('adhesions.laisse_a');
+            })->get();
 
             $depenses = Depense::where('colocation_id', $id)
                 ->whereHas('paiements', function ($q) {
                     $q->where('paye', false);
                 })
                 ->get();
-            $usersCount = $colocation->users()->count();
+            $usersCount = User::whereHas('colocations', function ($q) {
+                $q->whereNull('adhesions.laisse_a');
+            })->count();
+
 
             $dettes = [];
+            $part = 0;
             foreach ($depenses as $depense) {
-                $part = $depense->montant / $usersCount;
+                $part += $depense->montant / $usersCount;
                 $payeur = $colocation->users()->where('users.id', $depense->payeur_id)->first();
-                $payeur->solde = $part;
+                $payeur->solde = $depense->montant - $part;
                 $payeur->save();
-                foreach ($colocation->users()->where('users.id', '!=', $depense->payeur_id)->get() as $debiteur) {
-                    $debiteur->solde = -$part;
+                $debiteurs = User::where('users.id', '!=', $depense->payeur_id)->whereHas('colocations', function ($q) {
+                    $q->whereNull('adhesions.laisse_a');
+                })->get();
+                foreach ($debiteurs as $debiteur) {
+                    $debiteur->solde = $part;
                     $debiteur->save();
                     $dettes[] = (object) [
                         'montant' => $part,
@@ -150,7 +170,7 @@ class ColocationController extends Controller
                     $q->where('paye', true);
                 })
                 ->get();
-            return view('MemberColocation', compact('members','colocation', 'dettes', 'depensesNonPayees', 'depensesPayees'));
+            return view('MemberColocation', compact('members', 'colocation', 'dettes', 'depensesNonPayees', 'depensesPayees'));
         }
 
 
@@ -191,6 +211,74 @@ class ColocationController extends Controller
             }
         }
         return back()->with('error', 'Token invalide ou colocation inactive.');
+    }
+    public function removeMember($col_id, $user_id)
+    {
+        $adhesion = Adhesion::where('user_id', $user_id)
+            ->where('colocation_id', $col_id)
+            ->firstOrFail();
+        $adhesion->laisse_a = now();
+        $adhesion->save();
+        $colocation = Colocation::find($col_id);
+        $members_count = User::whereHas('colocations', function ($q) use ($colocation) {
+            $q->where('colocations.id', $colocation->id)
+                ->whereNull('adhesions.laisse_a');
+        })->count();
+        $user = User::find($user_id);
+        $user_solde = $user->solde;
+        $depense = Depense::where('colocation_id', $col_id)->where('payeur_id', $user_id)->first();
+        $paiements = $user->paiements()->get();
+
+        if ($user_solde < 0 && $members_count > 0) {
+            $user->reputation -= 1;
+            $user->solde = 0;
+            $user->save();
+
+            return redirect()->route('colocations.show', $col_id);
+        } else if ($user_solde >= 0) {
+            $user->solde = 0;
+            $user->reputation += 1;
+            $user->save();
+            foreach ($paiements as $paiement) {
+                $paiement->paye = true;
+                $paiement->save();
+            }
+            return redirect()->route('colocations.show', $col_id);
+
+        }
+
+
+
+    }
+    public function leaveMember($id)
+    {
+        $user = Auth::user();
+        $user_id = $user->id;
+        $user_solde = $user->solde;
+        $adhesion = Adhesion::where('user_id', $user_id)
+            ->where('colocation_id', $id)
+            ->firstOrFail();
+        $adhesion->laisse_a = now();
+        $adhesion->save();
+        $paiements = $user->paiements()->get();
+
+        if ($user_solde < 0) {
+            $user->reputation -= 1;
+            $user->solde = 0;
+            $user->save();
+
+            return redirect()->route('admin.colocations.index');
+        } else if ($user_solde >= 0) {
+            $user->solde = 0;
+            $user->reputation += 1;
+            $user->save();
+            foreach ($paiements as $paiement) {
+                $paiement->paye = true;
+                $paiement->save();
+            }
+            return redirect()->route('admin.colocations.index');
+
+        }
     }
 
 
