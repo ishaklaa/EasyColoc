@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('montant');
             $table->foreignId('user_id')->constrained();
             $table->foreignId('depense_id')->constrained();
-            $table->boolean('paye');
+            $table->boolean('paye')->default(false);
         });
     }
 

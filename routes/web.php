@@ -35,6 +35,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/colocations.joinForm',[ColocationController::class,'join'])->name('colocations.joinForm');
     Route::post('/colocations.joinByToken',[ColocationController::class,'tokenCheck'])->name('colocations.joinByToken');
     Route::get('/depense.create/{id}',[DepenseController::class,'create'])->name('depense.create');
+    Route::post('/depense.store/{id}',[DepenseController::class,'store'])->name('depense.store');
+    Route::post('/depense.payer/{id}',[DepenseController::class,'markPayed'])->name('depense.payer');
 });
 
 require __DIR__.'/auth.php';

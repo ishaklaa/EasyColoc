@@ -81,51 +81,83 @@
                     Ajouter une dépense
                 </a>
 
-                {{-- Liste des dépenses --}}
-                <div class="space-y-4 mt-4">
-                    @forelse($depenses as $depense)
-                        <div class="bg-gray-50 p-4 rounded-lg border flex justify-between items-center">
-                            <div>
-                                <p class="font-semibold text-gray-800">{{ $depense->titre }} - {{ $depense->montant }}€</p>
-                                <p class="text-gray-500 text-sm">
-                                    Catégorie : {{ $depense->categorie->titre ?? 'Non définie' }}
-                                </p>
-                            </div>
+              
+                {{-- Dépenses non payées --}}
+                <div class="bg-white rounded-2xl shadow-md p-6 mb-10">
+                    <h2 class="text-2xl font-semibold text-red-600 mb-6">
+                        Dépenses non payées
+                    </h2>
 
-                            <div>
-                                @if(!$depense->is_paid)
-                                    <form method="POST" action="{{ route('depense.payer', $depense->id) }}">
-                                        @csrf
-                                        <button type="submit"
-                                            class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg shadow transition">
-                                            Payer
-                                        </button>
-                                    </form>
-                                @else
-                                    <span class="text-gray-600 font-semibold">La dépense est payée</span>
-                                @endif
+                    <div class="space-y-4">
+                        @forelse($depensesNonPayees as $depense)
+                            <div class="bg-red-50 p-4 rounded-lg border flex justify-between items-center">
+                                <div>
+                                    <p class="font-semibold text-gray-800">
+                                        {{ $depense->titre }} - {{ $depense->montant }}Dh
+                                    </p>
+                                    <p class="text-gray-500 text-sm">
+                                        Catégorie : {{ $depense->categorie ?? 'Non définie' }}
+                                    </p>
+                                </div>
+
+                                <form method="POST" action="{{ route('depense.payer', $depense->id,) }}">
+                                    @csrf
+                                    <button type="submit"
+                                        class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg shadow transition">
+                                        Payer
+                                    </button>
+                                </form>
                             </div>
-                        </div>
-                    @empty
-                        <p class="text-gray-500">Aucune dépense pour le moment.</p>
-                    @endforelse
+                        @empty
+                            <p class="text-gray-500">Aucune dépense non payée 🎉</p>
+                        @endforelse
+                    </div>
                 </div>
+
+
+
+                {{-- Dépenses payées --}}
+                <div class="bg-white rounded-2xl shadow-md p-6">
+                    <h2 class="text-2xl font-semibold text-green-600 mb-6">
+                        Dépenses payées
+                    </h2>
+
+                    <div class="space-y-4">
+                        @forelse($depensesPayees as $depense)
+                            <div class="bg-green-50 p-4 rounded-lg border flex justify-between items-center">
+                                <div>
+                                    <p class="font-semibold text-gray-800">
+                                        {{ $depense->titre }} - {{ $depense->montant }}Dh
+                                    </p>
+                                    <p class="text-gray-500 text-sm">
+                                        Catégorie : {{ $depense->categorie ?? 'Non définie' }}
+                                    </p>
+                                </div>
+
+                                <span class="text-green-600 font-semibold">
+                                    ✔ La dépense est payée
+                                </span>
+                            </div>
+                        @empty
+                            <p class="text-gray-500">Aucune dépense payée.</p>
+                        @endforelse
+                    </div>
+                </div>
+
+                {{-- Qui doit à qui --}}
+                <div class="bg-white rounded-2xl shadow-md p-6">
+                    <h2 class="text-2xl font-semibold text-gray-800 mb-6">Qui doit à qui</h2>
+                    <div class="space-y-2">
+                        @forelse($dettes as $dette)
+                            <p class="text-gray-700">
+                                {{ $dette->debiteur->name }} doit {{ $dette->creancier->name }} {{ $dette->montant }}dh
+                            </p>
+                        @empty
+                            <p class="text-gray-500">Aucune dette pour le moment.</p>
+                        @endforelse
+                    </div>
             </div>
 
-            {{-- Qui doit à qui --}}
-            <div class="bg-white rounded-2xl shadow-md p-6">
-                <h2 class="text-2xl font-semibold text-gray-800 mb-6">Qui doit à qui</h2>
-                <div class="space-y-2">
-                    @forelse($dettes as $dette)
-                        <p class="text-gray-700">
-                            {{ $dette->debiteur->name }} doit {{ $dette->creancier->name }} {{ $dette->montant }}€
-                        </p>
-                    @empty
-                        <p class="text-gray-500">Aucune dette pour le moment.</p>
-                    @endforelse
-                </div>
             </div>
-
         </div>
-    </div>
 @endsection

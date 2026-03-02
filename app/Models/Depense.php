@@ -14,10 +14,10 @@ class Depense extends Model
         'montant',
         'createur_id',
         'payeur_id',
-        'adhesion_id',
         'colocation_id',
         'paye',
-        'depense_id',
+        'categorie',
+        
     ];
     public function paiements(){
         return $this->hasMany(Paiement::class);

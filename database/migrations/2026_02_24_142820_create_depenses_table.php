@@ -19,6 +19,7 @@ return new class extends Migration
             $table->foreignId('createur_id')->constrained('users');
             $table->foreignId('payeur_id')->constrained('users');
             $table->foreignId('colocation_id')->constrained();
+            $table->string('categorie');
             
         });
     }

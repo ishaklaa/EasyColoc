@@ -19,11 +19,11 @@
                     {{-- Catégorie --}}
                     <div class="mb-4">
                         <label class="block text-gray-700 font-semibold mb-2" for="categorie_id">Catégorie</label>
-                        <select name="categorie_id" id="categorie_id" required
+                        <select name="categorie" id="categorie_id" required
                             class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 px-4 py-2">
                             <option value="">Sélectionner une catégorie</option>
                             @foreach($categories as $category)
-                                <option value="{{ $category->id }}">{{ $category->titre }}</option>
+                                <option value="{{ $category->titre }}">{{ $category->titre }}</option>
                             @endforeach
                         </select>
                     </div>

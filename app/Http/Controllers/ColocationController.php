@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Adhesion;
 use App\Models\Colocation;
 
+use App\Models\Depense;
 use App\Models\Invitation;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
@@ -21,7 +22,7 @@ class ColocationController extends Controller
         $user = Auth::user();
         $currentColocation = Colocation::where('statut', 'active')
             ->whereHas('users', function ($q) use ($user) {
-                $q->where('users.id', $user->id);
+                $q->where('users.id', $user->id)->whereNull('adhesions.laisse_a');
             })->first();
         $pastColocations = Colocation::whereHas('users', function ($q) use ($user) {
             $q->where('users.id', $user->id)
@@ -73,10 +74,83 @@ class ColocationController extends Controller
                 'statut' => 'en attente',
                 'token' => $invitation_token,
             ]);
-            // $invitation_token = Invitation::where('colocation_id', $id)->latest()->first()->token;
-            return view('OwnerColocation', compact('members', 'categories', 'colocation', 'invitation_token'));
+            $colocation = Colocation::find($id);
+            $depenses = Depense::where('colocation_id', $id)
+                ->whereHas('paiements', function ($q) {
+                    $q->where('paye', false);
+                })
+                ->get();
+            $usersCount = $colocation->users()->count();
+
+            $dettes = [];
+            foreach ($depenses as $depense) {
+                $part = $depense->montant / $usersCount;
+                $payeur = $colocation->users()->where('users.id', $depense->payeur_id)->first();
+                $payeur->solde = $part;
+                $payeur->save();
+                foreach ($colocation->users()->where('users.id', '!=', $depense->payeur_id)->get() as $debiteur) {
+                    $debiteur->solde = -$part;
+                    $debiteur->save();
+                    $dettes[] = (object) [
+                        'montant' => $part,
+                        'creancier' => $payeur,
+                        'debiteur' => $debiteur
+                    ];
+                }
+            }
+
+            $depensesNonPayees = Depense::where('colocation_id', $id)
+                ->whereHas('paiements', function ($q) {
+                    $q->where('paye', false);
+                })
+                ->get();
+            $depensesPayees = Depense::where('colocation_id', $id)
+                ->whereHas('paiements', function ($q) {
+                    $q->where('paye', true);
+                })
+                ->get();
+            return view('OwnerColocation', compact('members', 'categories', 'colocation', 'invitation_token', 'dettes', 'depensesNonPayees', 'depensesPayees'));
         } else {
-            return view('MemberColocation');
+          
+
+            $colocation = Colocation::find($id);
+            $members = $colocation->users()->get();
+
+            $depenses = Depense::where('colocation_id', $id)
+                ->whereHas('paiements', function ($q) {
+                    $q->where('paye', false);
+                })
+                ->get();
+            $usersCount = $colocation->users()->count();
+
+            $dettes = [];
+            foreach ($depenses as $depense) {
+                $part = $depense->montant / $usersCount;
+                $payeur = $colocation->users()->where('users.id', $depense->payeur_id)->first();
+                $payeur->solde = $part;
+                $payeur->save();
+                foreach ($colocation->users()->where('users.id', '!=', $depense->payeur_id)->get() as $debiteur) {
+                    $debiteur->solde = -$part;
+                    $debiteur->save();
+                    $dettes[] = (object) [
+                        'montant' => $part,
+                        'creancier' => $payeur,
+                        'debiteur' => $debiteur
+                    ];
+                }
+            }
+
+            $depensesNonPayees = Depense::where('colocation_id', $id)
+                ->whereHas('paiements', function ($q) {
+                    $q->where('paye', false);
+                })
+                ->get();
+            $depensesPayees = Depense::where('colocation_id', $id)
+                ->whereHas('paiements', function ($q) {
+                    $q->where('paye', true);
+                })
+                ->get();
+            return view('MemberColocation', compact('members','colocation', 'dettes', 'depensesNonPayees', 'depensesPayees'));
         }
 
 
