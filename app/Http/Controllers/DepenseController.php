@@ -41,22 +41,7 @@ class DepenseController extends Controller
     ]);
     return redirect()->route('colocations.show', $id);
   }
-  // public function getDepense($id)
-  // {
-  //   $colocation = Colocation::find($id);
-
-  //   $depensesNonPayees = Depense::where('colocation_id', $id)
-  //     ->whereHas('paiements', function ($q) {
-  //       $q->where('paye', false);
-  //     })
-  //     ->get();
-  //   $depensesPayees = Depense::where('colocation_id', $id)
-  //     ->whereHas('paiements', function ($q) {
-  //       $q->where('paye', true);
-  //     })
-  //     ->get();
-  //   return view('OwnerColocation', compact('colocation', 'depensesNonPayees', 'depensesPayees'));
-  // }
+  
   public function markPayed($id)
   {
     $depense = Depense::find($id);

@@ -45,7 +45,7 @@ class ColocationController extends Controller
         $user = Auth::user();
         $isUserIn = Colocation::where('statut', 'active')
             ->whereHas('users', function ($q) use ($user) {
-                $q->where('users.id', $user->id);
+                $q->where('users.id', $user->id)->whereNull('adhesions.laisse_a');
             })
             ->exists();
         if ($isUserIn) {
@@ -198,7 +198,7 @@ class ColocationController extends Controller
         if ($colocation) {
             $isUserIn = Colocation::where('statut', 'active')
                 ->whereHas('users', function ($q) use ($user) {
-                    $q->where('users.id', $user->id);
+                    $q->where('users.id', $user->id)->whereNull('adhesions.laisse_a');
                 })
                 ->exists();
             if ($isUserIn) {
@@ -255,11 +255,10 @@ class ColocationController extends Controller
         $user = Auth::user();
         $user_id = $user->id;
         $user_solde = $user->solde;
-        $adhesion = Adhesion::where('user_id', $user_id)
+        Adhesion::where('user_id', $user_id)
             ->where('colocation_id', $id)
-            ->firstOrFail();
-        $adhesion->laisse_a = now();
-        $adhesion->save();
+            ->update(['laisse_a' => now()]);
+        
         $paiements = $user->paiements()->get();
 
         if ($user_solde < 0) {
